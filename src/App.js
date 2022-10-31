@@ -8,10 +8,12 @@ import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 import Home from "./components/home";
 import About from "./components/about";
+import Notestate from './context/notes/noteState';
 // import { Component } from 'react';
 function App() {
   return (
-    
+    <Notestate>
+      {/* wrapping up inside notestate variable so that everyy children and grand children can access these value */}
     <Router>
            <div className="app">
             <Navbar/>
@@ -22,6 +24,7 @@ function App() {
             </Routes>
             </div>
     </Router>
+    </Notestate>
   );
 }
 
