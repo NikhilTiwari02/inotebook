@@ -14,7 +14,7 @@ body('password').isLength({ min: 5 }).withMessage('must be at least 5 chars long
 body('name').isLength({min:3}).withMessage('must be at least 3 chars long'),
 async (req,res)=>{  
   //async then only we can use await for promises
-  const errors = validationResult(req);
+  const errors =validationResult(req);
   if (!errors.isEmpty()) { 
     //if error occur
     return res.status(400).json({ errors: errors.array() });
@@ -23,20 +23,25 @@ async (req,res)=>{
   const salt=await bcrypt.genSalt(10);
   const secpass=await bcrypt.hash(req.body.password,salt);
   //generating secret hash using salt with password
-  const user= User.create({ //User is imported form models
+  try{
+  const user= await User.create({ //User is imported form models
         name: req.body.name,
         password: secpass,
         email: req.body.email
         
-      }).then(user => res.json(user)).catch((error)=>{
-        // console.log(secpass);
-        res.status(400).json({"error":"email already exist"})});
+      })
+        //creating token and saving
        const data={
            user:{
              id:user.id
            }}
     const token=jwt.sign(data,secret);
-    console.log(token);
+    return res.json({token,val:true});
+          }
+     catch(error)
+     {
+       res.status(500).send({val:false})
+     }
 })
 // creating /login for user login
 // validation email should be valid and password cannot be blank
@@ -55,19 +60,19 @@ async (req,res)=>{
   {
     return res.status(400).json("Enter email doesn't exist");
   }
-  const comp= await bcrypt.compare(password,user.password);
+  const comp=await bcrypt.compare(password,user.password);
   // console.log(comp)
   if(!comp)
-  {
-    return res.status(400).json("incorrect password");
+  { console.log(comp)
+    return res.status(400).json({comp,token:""});
   }
   const data={
       user:{
         id:user.id
       }
   }
-  const token=jwt.sign(data,secret)
-  res.send(token);
+  const token=jwt.sign(data,secret);
+  res.json({token,comp});
 }
 catch(error)
   {

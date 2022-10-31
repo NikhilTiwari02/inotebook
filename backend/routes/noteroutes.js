@@ -7,7 +7,6 @@ router.get('/fetchallnotes',fetchuser,async (req,res)=>{
       const allnotes=await Notes.find({user:req.user.id});
       res.json(allnotes);
 });
-
 // add new notes to the database of that person
 router.post('/addnotes',fetchuser,body('title').isLength({min:3}).withMessage('Title should be of length 3'),body('description').isLength({min:10}).withMessage("Description should be of length 10"),async(req,res)=>{
     try{
